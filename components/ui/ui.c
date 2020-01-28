@@ -16,7 +16,8 @@
 #include <nvs_flash.h>
 #include <driver/gpio.h>
 #include <stdio.h>
-#include "ws2812.h"
+//@todo fix neopixel
+//#include "ws2812.h"
 #include "ui.h"
 
 #define TAG "ui"
@@ -33,17 +34,17 @@ typedef struct {
 /** UI object instance */
 static ui_obj_t *p_ui_obj = NULL;
 
-static rgbVal black;
+/*static rgbVal black;
 static rgbVal white;
 static rgbVal red;
 static rgbVal green;
-static rgbVal blue;
+static rgbVal blue;*/
 
 
 void task_ui(void *pvParameters)
 {
     ui_event_t curr_anim = UI_NONE;
-    rgbVal *next_color = &black;
+    //rgbVal *next_color = &black;
     // be lazy and use queue for blink speed
     TickType_t delay = portMAX_DELAY;
 
@@ -53,18 +54,18 @@ void task_ui(void *pvParameters)
         switch(curr_anim) {
             case UI_NONE:
                 delay = portMAX_DELAY;
-                ws2812_setColors(1, &black);
+               // ws2812_setColors(1, &black);
             break;
 
             case UI_CONNECTING:
                 delay = delay_ms(250);
-                next_color = (next_color == &white) ? &blue : &white;
-                ws2812_setColors(1, next_color);
+                //next_color = (next_color == &white) ? &blue : &white;
+               // ws2812_setColors(1, next_color);
             break;
 
             case UI_CONNECTED:
                 delay = portMAX_DELAY;
-                ws2812_setColors(1, &white);
+                //ws2812_setColors(1, &white);
             break;
         }
         // ESP_LOGI(TAG, "task_ui stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
@@ -92,14 +93,14 @@ int ui_init(gpio_num_t pin)
     p_ui_obj->queue_size = 1;
     p_ui_obj->ui_queue = xQueueCreate(1, sizeof(ui_event_t));
 
-    black    = makeRGBVal(0, 0, 0);
+    /*black    = makeRGBVal(0, 0, 0);
     white    = makeRGBVal(32, 32, 32);
     red      = makeRGBVal(32, 0, 0);
     green    = makeRGBVal(0, 32, 0);
-    blue    = makeRGBVal(0, 0, 32);
+    blue    = makeRGBVal(0, 0, 32);*/
 
-    ws2812_init(pin);
-    ws2812_setColors(1, &black);
+   // ws2812_init(pin);
+  //  ws2812_setColors(1, &black);
 
     xTaskCreatePinnedToCore(&task_ui, "task_ui", 2048, NULL, 20, NULL, 0);
 

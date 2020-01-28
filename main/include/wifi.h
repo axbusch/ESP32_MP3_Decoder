@@ -9,8 +9,8 @@
 #define _INCLUDE_WIFI_H_
 
 /* The event group allows multiple bits for each event,
-   but we only care about one event - are we connected
-   to the AP with an IP? */
+ but we only care about one event - are we connected
+ to the AP with an IP? */
 extern const int CONNECTED_BIT;
 
 void initialise_wifi(EventGroupHandle_t wifi_event_group);

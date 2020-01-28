@@ -14,7 +14,7 @@
 
 #include "esp_log.h"
 #include "common_utils.h"
-#include "vector.h"
+
 #include "playlist.h"
 #include "ini.h"
 

@@ -85,9 +85,8 @@ void nghttp2_downcase(uint8_t *s, size_t len);
  *     local_window_size overflow or gets negative.
  */
 int nghttp2_adjust_local_window_size(int32_t *local_window_size_ptr,
-                                     int32_t *recv_window_size_ptr,
-                                     int32_t *recv_reduction_ptr,
-                                     int32_t *delta_ptr);
+		int32_t *recv_window_size_ptr, int32_t *recv_reduction_ptr,
+		int32_t *delta_ptr);
 
 /*
  * This function works like nghttp2_adjust_local_window_size().  The
@@ -101,22 +100,21 @@ int nghttp2_adjust_local_window_size(int32_t *local_window_size_ptr,
  *     local_window_size overflow or gets negative.
  */
 int nghttp2_increase_local_window_size(int32_t *local_window_size_ptr,
-                                       int32_t *recv_window_size_ptr,
-                                       int32_t *recv_reduction_ptr,
-                                       int32_t *delta_ptr);
+		int32_t *recv_window_size_ptr, int32_t *recv_reduction_ptr,
+		int32_t *delta_ptr);
 
 /*
  * Returns non-zero if the function decided that WINDOW_UPDATE should
  * be sent.
  */
 int nghttp2_should_send_window_update(int32_t local_window_size,
-                                      int32_t recv_window_size);
+		int32_t recv_window_size);
 
 /*
  * Copies the buffer |src| of length |len| to the destination pointed
  * by the |dest|, assuming that the |dest| is at lest |len| bytes long
  * . Returns dest + len.
  */
-uint8_t *nghttp2_cpymem(uint8_t *dest, const void *src, size_t len);
+uint8_t* nghttp2_cpymem(uint8_t *dest, const void *src, size_t len);
 
 #endif /* NGHTTP2_HELPER_H */

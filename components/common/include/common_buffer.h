@@ -18,20 +18,19 @@
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-typedef struct
-{
-    uint8_t *base;
-    uint8_t *read_pos;
-    uint8_t *write_pos;
-    uint16_t len;
-    uint32_t bytes_consumed;
+typedef struct {
+	uint8_t *base;
+	uint8_t *read_pos;
+	uint8_t *write_pos;
+	uint16_t len;
+	uint32_t bytes_consumed;
 } buffer_t;
 
 /* create a buffer on the heap */
-buffer_t *buf_create(size_t len);
+buffer_t* buf_create(size_t len);
 
 /* wraps an existing buffer */
-buffer_t *buf_wrap(void *existing, size_t len);
+buffer_t* buf_wrap(void *existing, size_t len);
 
 /* free the backing storage, and the struct itself */
 int buf_destroy(buffer_t *buf);
@@ -70,16 +69,16 @@ size_t buf_data_stale(buffer_t *buf);
  * @param size Size, in bytes, of each element to be read.
  * @param count Number of elements, each one with a size of size bytes.
  */
-size_t buf_read( void * ptr, size_t size, size_t count, buffer_t *buf);
+size_t buf_read(void *ptr, size_t size, size_t count, buffer_t *buf);
 
 uint16_t fread16(buffer_t *buf, size_t position);
 uint32_t fread32(buffer_t *buf, size_t position);
 
-unsigned int REV16( unsigned int value);
-unsigned int REV32( unsigned int value);
+unsigned int REV16(unsigned int value);
+unsigned int REV32(unsigned int value);
 
 /* write bytes into the buffer */
-size_t buf_write(buffer_t *buf, const void* from, size_t len);
+size_t buf_write(buffer_t *buf, const void *from, size_t len);
 
 /* todo: move elsewhere */
 size_t fill_read_buffer(buffer_t *buf);

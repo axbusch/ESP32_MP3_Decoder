@@ -32,88 +32,87 @@
 #include "nghttp2_debug.h"
 
 /* Maximum distance between any two stream's cycle in the same
-   prirority queue.  Imagine stream A's cycle is A, and stream B's
-   cycle is B, and A < B.  The cycle is unsigned 32 bit integer, it
-   may get overflow.  Because of how we calculate the next cycle
-   value, if B - A is less than or equals to
-   NGHTTP2_MAX_CYCLE_DISTANCE, A and B are in the same scale, in other
-   words, B is really greater than or equal to A.  Otherwise, A is a
-   result of overflow, and it is actually A > B if we consider that
-   fact. */
+ prirority queue.  Imagine stream A's cycle is A, and stream B's
+ cycle is B, and A < B.  The cycle is unsigned 32 bit integer, it
+ may get overflow.  Because of how we calculate the next cycle
+ value, if B - A is less than or equals to
+ NGHTTP2_MAX_CYCLE_DISTANCE, A and B are in the same scale, in other
+ words, B is really greater than or equal to A.  Otherwise, A is a
+ result of overflow, and it is actually A > B if we consider that
+ fact. */
 #define NGHTTP2_MAX_CYCLE_DISTANCE (16384 * 256 + 255)
 
 static int stream_less(const void *lhsx, const void *rhsx) {
-  const nghttp2_stream *lhs, *rhs;
+	const nghttp2_stream *lhs, *rhs;
 
-  lhs = nghttp2_struct_of(lhsx, nghttp2_stream, pq_entry);
-  rhs = nghttp2_struct_of(rhsx, nghttp2_stream, pq_entry);
+	lhs = nghttp2_struct_of(lhsx, nghttp2_stream, pq_entry);
+	rhs = nghttp2_struct_of(rhsx, nghttp2_stream, pq_entry);
 
-  if (lhs->cycle == rhs->cycle) {
-    return lhs->seq < rhs->seq;
-  }
+	if (lhs->cycle == rhs->cycle) {
+		return lhs->seq < rhs->seq;
+	}
 
-  if (lhs->cycle < rhs->cycle) {
-    return rhs->cycle - lhs->cycle <= NGHTTP2_MAX_CYCLE_DISTANCE;
-  }
+	if (lhs->cycle < rhs->cycle) {
+		return rhs->cycle - lhs->cycle <= NGHTTP2_MAX_CYCLE_DISTANCE;
+	}
 
-  return lhs->cycle - rhs->cycle > NGHTTP2_MAX_CYCLE_DISTANCE;
+	return lhs->cycle - rhs->cycle > NGHTTP2_MAX_CYCLE_DISTANCE;
 }
 
 void nghttp2_stream_init(nghttp2_stream *stream, int32_t stream_id,
-                         uint8_t flags, nghttp2_stream_state initial_state,
-                         int32_t weight, int32_t remote_initial_window_size,
-                         int32_t local_initial_window_size,
-                         void *stream_user_data, nghttp2_mem *mem) {
-  nghttp2_map_entry_init(&stream->map_entry, (key_type)stream_id);
-  nghttp2_pq_init(&stream->obq, stream_less, mem);
+		uint8_t flags, nghttp2_stream_state initial_state, int32_t weight,
+		int32_t remote_initial_window_size, int32_t local_initial_window_size,
+		void *stream_user_data, nghttp2_mem *mem) {
+	nghttp2_map_entry_init(&stream->map_entry, (key_type) stream_id);
+	nghttp2_pq_init(&stream->obq, stream_less, mem);
 
-  stream->stream_id = stream_id;
-  stream->flags = flags;
-  stream->state = initial_state;
-  stream->shut_flags = NGHTTP2_SHUT_NONE;
-  stream->stream_user_data = stream_user_data;
-  stream->item = NULL;
-  stream->remote_window_size = remote_initial_window_size;
-  stream->local_window_size = local_initial_window_size;
-  stream->recv_window_size = 0;
-  stream->consumed_size = 0;
-  stream->recv_reduction = 0;
-  stream->window_update_queued = 0;
+	stream->stream_id = stream_id;
+	stream->flags = flags;
+	stream->state = initial_state;
+	stream->shut_flags = NGHTTP2_SHUT_NONE;
+	stream->stream_user_data = stream_user_data;
+	stream->item = NULL;
+	stream->remote_window_size = remote_initial_window_size;
+	stream->local_window_size = local_initial_window_size;
+	stream->recv_window_size = 0;
+	stream->consumed_size = 0;
+	stream->recv_reduction = 0;
+	stream->window_update_queued = 0;
 
-  stream->dep_prev = NULL;
-  stream->dep_next = NULL;
-  stream->sib_prev = NULL;
-  stream->sib_next = NULL;
+	stream->dep_prev = NULL;
+	stream->dep_next = NULL;
+	stream->sib_prev = NULL;
+	stream->sib_next = NULL;
 
-  stream->closed_prev = NULL;
-  stream->closed_next = NULL;
+	stream->closed_prev = NULL;
+	stream->closed_next = NULL;
 
-  stream->weight = weight;
-  stream->sum_dep_weight = 0;
+	stream->weight = weight;
+	stream->sum_dep_weight = 0;
 
-  stream->http_flags = NGHTTP2_HTTP_FLAG_NONE;
-  stream->content_length = -1;
-  stream->recv_content_length = 0;
-  stream->status_code = -1;
+	stream->http_flags = NGHTTP2_HTTP_FLAG_NONE;
+	stream->content_length = -1;
+	stream->recv_content_length = 0;
+	stream->status_code = -1;
 
-  stream->queued = 0;
-  stream->descendant_last_cycle = 0;
-  stream->cycle = 0;
-  stream->pending_penalty = 0;
-  stream->descendant_next_seq = 0;
-  stream->seq = 0;
-  stream->last_writelen = 0;
+	stream->queued = 0;
+	stream->descendant_last_cycle = 0;
+	stream->cycle = 0;
+	stream->pending_penalty = 0;
+	stream->descendant_next_seq = 0;
+	stream->seq = 0;
+	stream->last_writelen = 0;
 }
 
 void nghttp2_stream_free(nghttp2_stream *stream) {
-  nghttp2_pq_free(&stream->obq);
-  /* We don't free stream->item.  If it is assigned to aob, then
-     active_outbound_item_reset() will delete it.  Otherwise,
-     nghttp2_stream_close() or session_del() will delete it. */
+	nghttp2_pq_free(&stream->obq);
+	/* We don't free stream->item.  If it is assigned to aob, then
+	 active_outbound_item_reset() will delete it.  Otherwise,
+	 nghttp2_stream_close() or session_del() will delete it. */
 }
 
 void nghttp2_stream_shutdown(nghttp2_stream *stream, nghttp2_shut_flag flag) {
-  stream->shut_flags = (uint8_t)(stream->shut_flags | flag);
+	stream->shut_flags = (uint8_t)(stream->shut_flags | flag);
 }
 
 /*
@@ -121,52 +120,52 @@ void nghttp2_stream_shutdown(nghttp2_stream *stream, nghttp2_shut_flag flag) {
  * into account its descendants.
  */
 static int stream_active(nghttp2_stream *stream) {
-  return stream->item &&
-         (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL) == 0;
+	return stream->item
+			&& (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL) == 0;
 }
 
 /*
  * Returns nonzero if |stream| or one of its descendants is active
  */
 static int stream_subtree_active(nghttp2_stream *stream) {
-  return stream_active(stream) || !nghttp2_pq_empty(&stream->obq);
+	return stream_active(stream) || !nghttp2_pq_empty(&stream->obq);
 }
 
 /*
  * Returns next cycle for |stream|.
  */
 static void stream_next_cycle(nghttp2_stream *stream, uint32_t last_cycle) {
-  uint32_t penalty;
+	uint32_t penalty;
 
-  penalty = (uint32_t)stream->last_writelen * NGHTTP2_MAX_WEIGHT +
-            stream->pending_penalty;
+	penalty = (uint32_t) stream->last_writelen * NGHTTP2_MAX_WEIGHT
+			+ stream->pending_penalty;
 
-  stream->cycle = last_cycle + penalty / (uint32_t)stream->weight;
-  stream->pending_penalty = penalty % (uint32_t)stream->weight;
+	stream->cycle = last_cycle + penalty / (uint32_t) stream->weight;
+	stream->pending_penalty = penalty % (uint32_t) stream->weight;
 }
 
 static int stream_obq_push(nghttp2_stream *dep_stream, nghttp2_stream *stream) {
-  int rv;
+	int rv;
 
-  for (; dep_stream && !stream->queued;
-       stream = dep_stream, dep_stream = dep_stream->dep_prev) {
-    stream_next_cycle(stream, dep_stream->descendant_last_cycle);
-    stream->seq = dep_stream->descendant_next_seq++;
+	for (; dep_stream && !stream->queued; stream = dep_stream, dep_stream =
+			dep_stream->dep_prev) {
+		stream_next_cycle(stream, dep_stream->descendant_last_cycle);
+		stream->seq = dep_stream->descendant_next_seq++;
 
-    DEBUGF("stream: stream=%d obq push cycle=%d\n", stream->stream_id,
-           stream->cycle);
+		DEBUGF("stream: stream=%d obq push cycle=%d\n", stream->stream_id,
+				stream->cycle);
 
-    DEBUGF("stream: push stream %d to stream %d\n", stream->stream_id,
-           dep_stream->stream_id);
+		DEBUGF("stream: push stream %d to stream %d\n", stream->stream_id,
+				dep_stream->stream_id);
 
-    rv = nghttp2_pq_push(&dep_stream->obq, &stream->pq_entry);
-    if (rv != 0) {
-      return rv;
-    }
-    stream->queued = 1;
-  }
+		rv = nghttp2_pq_push(&dep_stream->obq, &stream->pq_entry);
+		if (rv != 0) {
+			return rv;
+		}
+		stream->queued = 1;
+	}
 
-  return 0;
+	return 0;
 }
 
 /*
@@ -175,32 +174,32 @@ static int stream_obq_push(nghttp2_stream *dep_stream, nghttp2_stream *stream) {
  * removed.  This process is repeated recursively.
  */
 static void stream_obq_remove(nghttp2_stream *stream) {
-  nghttp2_stream *dep_stream;
+	nghttp2_stream *dep_stream;
 
-  dep_stream = stream->dep_prev;
+	dep_stream = stream->dep_prev;
 
-  if (!stream->queued) {
-    return;
-  }
+	if (!stream->queued) {
+		return;
+	}
 
-  for (; dep_stream; stream = dep_stream, dep_stream = dep_stream->dep_prev) {
-    DEBUGF("stream: remove stream %d from stream %d\n", stream->stream_id,
-           dep_stream->stream_id);
+	for (; dep_stream; stream = dep_stream, dep_stream = dep_stream->dep_prev) {
+		DEBUGF("stream: remove stream %d from stream %d\n", stream->stream_id,
+				dep_stream->stream_id);
 
-    nghttp2_pq_remove(&dep_stream->obq, &stream->pq_entry);
+		nghttp2_pq_remove(&dep_stream->obq, &stream->pq_entry);
 
-    assert(stream->queued);
+		assert(stream->queued);
 
-    stream->queued = 0;
-    stream->cycle = 0;
-    stream->pending_penalty = 0;
-    stream->descendant_last_cycle = 0;
-    stream->last_writelen = 0;
+		stream->queued = 0;
+		stream->cycle = 0;
+		stream->pending_penalty = 0;
+		stream->descendant_last_cycle = 0;
+		stream->last_writelen = 0;
 
-    if (stream_subtree_active(dep_stream)) {
-      return;
-    }
-  }
+		if (stream_subtree_active(dep_stream)) {
+			return;
+		}
+	}
 }
 
 /*
@@ -210,111 +209,111 @@ static void stream_obq_remove(nghttp2_stream *stream) {
  * stream_obq_remove().
  */
 static int stream_obq_move(nghttp2_stream *dest, nghttp2_stream *src,
-                           nghttp2_stream *stream) {
-  if (!stream->queued) {
-    return 0;
-  }
+		nghttp2_stream *stream) {
+	if (!stream->queued) {
+		return 0;
+	}
 
-  DEBUGF("stream: remove stream %d from stream %d (move)\n", stream->stream_id,
-         src->stream_id);
+	DEBUGF("stream: remove stream %d from stream %d (move)\n",
+			stream->stream_id, src->stream_id);
 
-  nghttp2_pq_remove(&src->obq, &stream->pq_entry);
-  stream->queued = 0;
+	nghttp2_pq_remove(&src->obq, &stream->pq_entry);
+	stream->queued = 0;
 
-  return stream_obq_push(dest, stream);
+	return stream_obq_push(dest, stream);
 }
 
 void nghttp2_stream_reschedule(nghttp2_stream *stream) {
-  nghttp2_stream *dep_stream;
+	nghttp2_stream *dep_stream;
 
-  assert(stream->queued);
+	assert(stream->queued);
 
-  dep_stream = stream->dep_prev;
+	dep_stream = stream->dep_prev;
 
-  for (; dep_stream; stream = dep_stream, dep_stream = dep_stream->dep_prev) {
-    nghttp2_pq_remove(&dep_stream->obq, &stream->pq_entry);
+	for (; dep_stream; stream = dep_stream, dep_stream = dep_stream->dep_prev) {
+		nghttp2_pq_remove(&dep_stream->obq, &stream->pq_entry);
 
-    stream_next_cycle(stream, dep_stream->descendant_last_cycle);
-    stream->seq = dep_stream->descendant_next_seq++;
+		stream_next_cycle(stream, dep_stream->descendant_last_cycle);
+		stream->seq = dep_stream->descendant_next_seq++;
 
-    nghttp2_pq_push(&dep_stream->obq, &stream->pq_entry);
+		nghttp2_pq_push(&dep_stream->obq, &stream->pq_entry);
 
-    DEBUGF("stream: stream=%d obq resched cycle=%d\n", stream->stream_id,
-           stream->cycle);
+		DEBUGF("stream: stream=%d obq resched cycle=%d\n", stream->stream_id,
+				stream->cycle);
 
-    dep_stream->last_writelen = stream->last_writelen;
-  }
+		dep_stream->last_writelen = stream->last_writelen;
+	}
 }
 
 void nghttp2_stream_change_weight(nghttp2_stream *stream, int32_t weight) {
-  nghttp2_stream *dep_stream;
-  uint32_t last_cycle;
-  int32_t old_weight;
-  uint32_t wlen_penalty;
+	nghttp2_stream *dep_stream;
+	uint32_t last_cycle;
+	int32_t old_weight;
+	uint32_t wlen_penalty;
 
-  if (stream->weight == weight) {
-    return;
-  }
+	if (stream->weight == weight) {
+		return;
+	}
 
-  old_weight = stream->weight;
-  stream->weight = weight;
+	old_weight = stream->weight;
+	stream->weight = weight;
 
-  dep_stream = stream->dep_prev;
+	dep_stream = stream->dep_prev;
 
-  if (!dep_stream) {
-    return;
-  }
+	if (!dep_stream) {
+		return;
+	}
 
-  dep_stream->sum_dep_weight += weight - old_weight;
+	dep_stream->sum_dep_weight += weight - old_weight;
 
-  if (!stream->queued) {
-    return;
-  }
+	if (!stream->queued) {
+		return;
+	}
 
-  nghttp2_pq_remove(&dep_stream->obq, &stream->pq_entry);
+	nghttp2_pq_remove(&dep_stream->obq, &stream->pq_entry);
 
-  wlen_penalty = (uint32_t)stream->last_writelen * NGHTTP2_MAX_WEIGHT;
+	wlen_penalty = (uint32_t) stream->last_writelen * NGHTTP2_MAX_WEIGHT;
 
-  /* Compute old stream->pending_penalty we used to calculate
-     stream->cycle */
-  stream->pending_penalty =
-      (uint32_t)((stream->pending_penalty + (uint32_t)old_weight -
-                  (wlen_penalty % (uint32_t)old_weight)) %
-                 (uint32_t)old_weight);
+	/* Compute old stream->pending_penalty we used to calculate
+	 stream->cycle */
+	stream->pending_penalty = (uint32_t)(
+			(stream->pending_penalty + (uint32_t) old_weight
+					- (wlen_penalty % (uint32_t) old_weight))
+					% (uint32_t) old_weight);
 
-  last_cycle = stream->cycle -
-               (wlen_penalty + stream->pending_penalty) / (uint32_t)old_weight;
+	last_cycle = stream->cycle
+			- (wlen_penalty + stream->pending_penalty) / (uint32_t) old_weight;
 
-  /* Now we have old stream->pending_penalty and new stream->weight in
-     place */
-  stream_next_cycle(stream, last_cycle);
+	/* Now we have old stream->pending_penalty and new stream->weight in
+	 place */
+	stream_next_cycle(stream, last_cycle);
 
-  if (stream->cycle < dep_stream->descendant_last_cycle &&
-      (dep_stream->descendant_last_cycle - stream->cycle) <=
-          NGHTTP2_MAX_CYCLE_DISTANCE) {
-    stream->cycle = dep_stream->descendant_last_cycle;
-  }
+	if (stream->cycle < dep_stream->descendant_last_cycle&&
+	(dep_stream->descendant_last_cycle - stream->cycle) <=
+	NGHTTP2_MAX_CYCLE_DISTANCE) {
+		stream->cycle = dep_stream->descendant_last_cycle;
+	}
 
-  /* Continue to use same stream->seq */
+	/* Continue to use same stream->seq */
 
-  nghttp2_pq_push(&dep_stream->obq, &stream->pq_entry);
+	nghttp2_pq_push(&dep_stream->obq, &stream->pq_entry);
 
-  DEBUGF("stream: stream=%d obq resched cycle=%d\n", stream->stream_id,
-         stream->cycle);
+	DEBUGF("stream: stream=%d obq resched cycle=%d\n", stream->stream_id,
+			stream->cycle);
 }
 
-static nghttp2_stream *stream_last_sib(nghttp2_stream *stream) {
-  for (; stream->sib_next; stream = stream->sib_next)
-    ;
+static nghttp2_stream* stream_last_sib(nghttp2_stream *stream) {
+	for (; stream->sib_next; stream = stream->sib_next)
+		;
 
-  return stream;
+	return stream;
 }
 
 int32_t nghttp2_stream_dep_distributed_weight(nghttp2_stream *stream,
-                                              int32_t weight) {
-  weight = stream->weight * weight / stream->sum_dep_weight;
+		int32_t weight) {
+	weight = stream->weight * weight / stream->sum_dep_weight;
 
-  return nghttp2_max(1, weight);
+	return nghttp2_max(1, weight);
 }
 
 #ifdef STREAM_DEP_DEBUG
@@ -450,553 +449,549 @@ static void validate_tree(nghttp2_stream *stream) {
   check_dep_prev(stream);
 }
 #else  /* !STREAM_DEP_DEBUG */
-static void validate_tree(nghttp2_stream *stream) { (void)stream; }
+static void validate_tree(nghttp2_stream *stream) {
+	(void) stream;
+}
 #endif /* !STREAM_DEP_DEBUG*/
 
 static int stream_update_dep_on_attach_item(nghttp2_stream *stream) {
-  int rv;
+	int rv;
 
-  rv = stream_obq_push(stream->dep_prev, stream);
-  if (rv != 0) {
-    return rv;
-  }
+	rv = stream_obq_push(stream->dep_prev, stream);
+	if (rv != 0) {
+		return rv;
+	}
 
-  validate_tree(stream);
-  return 0;
+	validate_tree(stream);
+	return 0;
 }
 
 static int stream_update_dep_on_detach_item(nghttp2_stream *stream) {
-  if (nghttp2_pq_empty(&stream->obq)) {
-    stream_obq_remove(stream);
-  }
+	if (nghttp2_pq_empty(&stream->obq)) {
+		stream_obq_remove(stream);
+	}
 
-  validate_tree(stream);
+	validate_tree(stream);
 
-  return 0;
+	return 0;
 }
 
 int nghttp2_stream_attach_item(nghttp2_stream *stream,
-                               nghttp2_outbound_item *item) {
-  int rv;
+		nghttp2_outbound_item *item) {
+	int rv;
 
-  assert((stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL) == 0);
-  assert(stream->item == NULL);
+	assert((stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL) == 0);
+	assert(stream->item == NULL);
 
-  DEBUGF("stream: stream=%d attach item=%p\n", stream->stream_id, item);
+	DEBUGF("stream: stream=%d attach item=%p\n", stream->stream_id, item);
 
-  stream->item = item;
+	stream->item = item;
 
-  rv = stream_update_dep_on_attach_item(stream);
-  if (rv != 0) {
-    /* This may relave stream->queued == 1, but stream->item == NULL.
-       But only consequence of this error is fatal one, and session
-       destruction.  In that execution path, these inconsistency does
-       not matter. */
-    stream->item = NULL;
-    return rv;
-  }
+	rv = stream_update_dep_on_attach_item(stream);
+	if (rv != 0) {
+		/* This may relave stream->queued == 1, but stream->item == NULL.
+		 But only consequence of this error is fatal one, and session
+		 destruction.  In that execution path, these inconsistency does
+		 not matter. */
+		stream->item = NULL;
+		return rv;
+	}
 
-  return 0;
+	return 0;
 }
 
 int nghttp2_stream_detach_item(nghttp2_stream *stream) {
-  DEBUGF("stream: stream=%d detach item=%p\n", stream->stream_id, stream->item);
+	DEBUGF("stream: stream=%d detach item=%p\n", stream->stream_id,
+			stream->item);
 
-  stream->item = NULL;
-  stream->flags = (uint8_t)(stream->flags & ~NGHTTP2_STREAM_FLAG_DEFERRED_ALL);
+	stream->item = NULL;
+	stream->flags = (uint8_t)(
+			stream->flags & ~NGHTTP2_STREAM_FLAG_DEFERRED_ALL);
 
-  return stream_update_dep_on_detach_item(stream);
+	return stream_update_dep_on_detach_item(stream);
 }
 
 int nghttp2_stream_defer_item(nghttp2_stream *stream, uint8_t flags) {
-  assert(stream->item);
+	assert(stream->item);
 
-  DEBUGF("stream: stream=%d defer item=%p cause=%02x\n", stream->stream_id,
-         stream->item, flags);
+	DEBUGF("stream: stream=%d defer item=%p cause=%02x\n", stream->stream_id,
+			stream->item, flags);
 
-  stream->flags |= flags;
+	stream->flags |= flags;
 
-  return stream_update_dep_on_detach_item(stream);
+	return stream_update_dep_on_detach_item(stream);
 }
 
 int nghttp2_stream_resume_deferred_item(nghttp2_stream *stream, uint8_t flags) {
-  assert(stream->item);
+	assert(stream->item);
 
-  DEBUGF("stream: stream=%d resume item=%p flags=%02x\n", stream->stream_id,
-         stream->item, flags);
+	DEBUGF("stream: stream=%d resume item=%p flags=%02x\n", stream->stream_id,
+			stream->item, flags);
 
-  stream->flags = (uint8_t)(stream->flags & ~flags);
+	stream->flags = (uint8_t)(stream->flags & ~flags);
 
-  if (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL) {
-    return 0;
-  }
+	if (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL) {
+		return 0;
+	}
 
-  return stream_update_dep_on_attach_item(stream);
+	return stream_update_dep_on_attach_item(stream);
 }
 
 int nghttp2_stream_check_deferred_item(nghttp2_stream *stream) {
-  return stream->item && (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL);
+	return stream->item && (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_ALL);
 }
 
 int nghttp2_stream_check_deferred_by_flow_control(nghttp2_stream *stream) {
-  return stream->item &&
-         (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_FLOW_CONTROL);
+	return stream->item
+			&& (stream->flags & NGHTTP2_STREAM_FLAG_DEFERRED_FLOW_CONTROL);
 }
 
 static int update_initial_window_size(int32_t *window_size_ptr,
-                                      int32_t new_initial_window_size,
-                                      int32_t old_initial_window_size) {
-  int64_t new_window_size = (int64_t)(*window_size_ptr) +
-                            new_initial_window_size - old_initial_window_size;
-  if (INT32_MIN > new_window_size ||
-      new_window_size > NGHTTP2_MAX_WINDOW_SIZE) {
-    return -1;
-  }
-  *window_size_ptr = (int32_t)new_window_size;
-  return 0;
+		int32_t new_initial_window_size, int32_t old_initial_window_size) {
+	int64_t new_window_size = (int64_t)(*window_size_ptr)
+			+ new_initial_window_size - old_initial_window_size;
+	if (INT32_MIN > new_window_size || new_window_size > NGHTTP2_MAX_WINDOW_SIZE) {
+		return -1;
+	}
+	*window_size_ptr = (int32_t) new_window_size;
+	return 0;
 }
 
-int nghttp2_stream_update_remote_initial_window_size(
-    nghttp2_stream *stream, int32_t new_initial_window_size,
-    int32_t old_initial_window_size) {
-  return update_initial_window_size(&stream->remote_window_size,
-                                    new_initial_window_size,
-                                    old_initial_window_size);
+int nghttp2_stream_update_remote_initial_window_size(nghttp2_stream *stream,
+		int32_t new_initial_window_size, int32_t old_initial_window_size) {
+	return update_initial_window_size(&stream->remote_window_size,
+			new_initial_window_size, old_initial_window_size);
 }
 
-int nghttp2_stream_update_local_initial_window_size(
-    nghttp2_stream *stream, int32_t new_initial_window_size,
-    int32_t old_initial_window_size) {
-  return update_initial_window_size(&stream->local_window_size,
-                                    new_initial_window_size,
-                                    old_initial_window_size);
+int nghttp2_stream_update_local_initial_window_size(nghttp2_stream *stream,
+		int32_t new_initial_window_size, int32_t old_initial_window_size) {
+	return update_initial_window_size(&stream->local_window_size,
+			new_initial_window_size, old_initial_window_size);
 }
 
 void nghttp2_stream_promise_fulfilled(nghttp2_stream *stream) {
-  stream->state = NGHTTP2_STREAM_OPENED;
-  stream->flags = (uint8_t)(stream->flags & ~NGHTTP2_STREAM_FLAG_PUSH);
+	stream->state = NGHTTP2_STREAM_OPENED;
+	stream->flags = (uint8_t)(stream->flags & ~NGHTTP2_STREAM_FLAG_PUSH);
 }
 
 int nghttp2_stream_dep_find_ancestor(nghttp2_stream *stream,
-                                     nghttp2_stream *target) {
-  for (; stream; stream = stream->dep_prev) {
-    if (stream == target) {
-      return 1;
-    }
-  }
-  return 0;
+		nghttp2_stream *target) {
+	for (; stream; stream = stream->dep_prev) {
+		if (stream == target) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 int nghttp2_stream_dep_insert(nghttp2_stream *dep_stream,
-                              nghttp2_stream *stream) {
-  nghttp2_stream *si;
-  int rv;
+		nghttp2_stream *stream) {
+	nghttp2_stream *si;
+	int rv;
 
-  DEBUGF("stream: dep_insert dep_stream(%p)=%d, stream(%p)=%d\n", dep_stream,
-         dep_stream->stream_id, stream, stream->stream_id);
+	DEBUGF("stream: dep_insert dep_stream(%p)=%d, stream(%p)=%d\n", dep_stream,
+			dep_stream->stream_id, stream, stream->stream_id);
 
-  stream->sum_dep_weight = dep_stream->sum_dep_weight;
-  dep_stream->sum_dep_weight = stream->weight;
+	stream->sum_dep_weight = dep_stream->sum_dep_weight;
+	dep_stream->sum_dep_weight = stream->weight;
 
-  if (dep_stream->dep_next) {
-    for (si = dep_stream->dep_next; si; si = si->sib_next) {
-      si->dep_prev = stream;
-      if (si->queued) {
-        rv = stream_obq_move(stream, dep_stream, si);
-        if (rv != 0) {
-          return rv;
-        }
-      }
-    }
+	if (dep_stream->dep_next) {
+		for (si = dep_stream->dep_next; si; si = si->sib_next) {
+			si->dep_prev = stream;
+			if (si->queued) {
+				rv = stream_obq_move(stream, dep_stream, si);
+				if (rv != 0) {
+					return rv;
+				}
+			}
+		}
 
-    if (stream_subtree_active(stream)) {
-      rv = stream_obq_push(dep_stream, stream);
-      if (rv != 0) {
-        return rv;
-      }
-    }
+		if (stream_subtree_active(stream)) {
+			rv = stream_obq_push(dep_stream, stream);
+			if (rv != 0) {
+				return rv;
+			}
+		}
 
-    stream->dep_next = dep_stream->dep_next;
-  }
+		stream->dep_next = dep_stream->dep_next;
+	}
 
-  dep_stream->dep_next = stream;
-  stream->dep_prev = dep_stream;
+	dep_stream->dep_next = stream;
+	stream->dep_prev = dep_stream;
 
-  validate_tree(stream);
+	validate_tree(stream);
 
-  return 0;
+	return 0;
 }
 
 static void set_dep_prev(nghttp2_stream *stream, nghttp2_stream *dep) {
-  for (; stream; stream = stream->sib_next) {
-    stream->dep_prev = dep;
-  }
+	for (; stream; stream = stream->sib_next) {
+		stream->dep_prev = dep;
+	}
 }
 
 static void link_dep(nghttp2_stream *dep_stream, nghttp2_stream *stream) {
-  dep_stream->dep_next = stream;
-  if (stream) {
-    stream->dep_prev = dep_stream;
-  }
+	dep_stream->dep_next = stream;
+	if (stream) {
+		stream->dep_prev = dep_stream;
+	}
 }
 
 static void link_sib(nghttp2_stream *a, nghttp2_stream *b) {
-  a->sib_next = b;
-  if (b) {
-    b->sib_prev = a;
-  }
+	a->sib_next = b;
+	if (b) {
+		b->sib_prev = a;
+	}
 }
 
-static void insert_link_dep(nghttp2_stream *dep_stream,
-                            nghttp2_stream *stream) {
-  nghttp2_stream *sib_next;
+static void insert_link_dep(nghttp2_stream *dep_stream, nghttp2_stream *stream) {
+	nghttp2_stream *sib_next;
 
-  assert(stream->sib_prev == NULL);
+	assert(stream->sib_prev == NULL);
 
-  sib_next = dep_stream->dep_next;
+	sib_next = dep_stream->dep_next;
 
-  link_sib(stream, sib_next);
+	link_sib(stream, sib_next);
 
-  link_dep(dep_stream, stream);
+	link_dep(dep_stream, stream);
 }
 
 static void unlink_sib(nghttp2_stream *stream) {
-  nghttp2_stream *prev, *next, *dep_next;
+	nghttp2_stream *prev, *next, *dep_next;
 
-  prev = stream->sib_prev;
-  dep_next = stream->dep_next;
+	prev = stream->sib_prev;
+	dep_next = stream->dep_next;
 
-  assert(prev);
+	assert(prev);
 
-  if (dep_next) {
-    /*
-     *  prev--stream(--sib_next--...)
-     *         |
-     *        dep_next
-     */
+	if (dep_next) {
+		/*
+		 *  prev--stream(--sib_next--...)
+		 *         |
+		 *        dep_next
+		 */
 
-    link_sib(prev, dep_next);
+		link_sib(prev, dep_next);
 
-    set_dep_prev(dep_next, stream->dep_prev);
+		set_dep_prev(dep_next, stream->dep_prev);
 
-    if (stream->sib_next) {
-      link_sib(stream_last_sib(dep_next), stream->sib_next);
-    }
-  } else {
-    /*
-     *  prev--stream(--sib_next--...)
-     */
-    next = stream->sib_next;
+		if (stream->sib_next) {
+			link_sib(stream_last_sib(dep_next), stream->sib_next);
+		}
+	} else {
+		/*
+		 *  prev--stream(--sib_next--...)
+		 */
+		next = stream->sib_next;
 
-    prev->sib_next = next;
+		prev->sib_next = next;
 
-    if (next) {
-      next->sib_prev = prev;
-    }
-  }
+		if (next) {
+			next->sib_prev = prev;
+		}
+	}
 }
 
 static void unlink_dep(nghttp2_stream *stream) {
-  nghttp2_stream *prev, *next, *dep_next;
+	nghttp2_stream *prev, *next, *dep_next;
 
-  prev = stream->dep_prev;
-  dep_next = stream->dep_next;
+	prev = stream->dep_prev;
+	dep_next = stream->dep_next;
 
-  assert(prev);
+	assert(prev);
 
-  if (dep_next) {
-    /*
-     * prev
-     *   |
-     * stream(--sib_next--...)
-     *   |
-     * dep_next
-     */
-    link_dep(prev, dep_next);
+	if (dep_next) {
+		/*
+		 * prev
+		 *   |
+		 * stream(--sib_next--...)
+		 *   |
+		 * dep_next
+		 */
+		link_dep(prev, dep_next);
 
-    set_dep_prev(dep_next, stream->dep_prev);
+		set_dep_prev(dep_next, stream->dep_prev);
 
-    if (stream->sib_next) {
-      link_sib(stream_last_sib(dep_next), stream->sib_next);
-    }
+		if (stream->sib_next) {
+			link_sib(stream_last_sib(dep_next), stream->sib_next);
+		}
 
-  } else if (stream->sib_next) {
-    /*
-     * prev
-     *   |
-     * stream--sib_next
-     */
-    next = stream->sib_next;
+	} else if (stream->sib_next) {
+		/*
+		 * prev
+		 *   |
+		 * stream--sib_next
+		 */
+		next = stream->sib_next;
 
-    next->sib_prev = NULL;
+		next->sib_prev = NULL;
 
-    link_dep(prev, next);
-  } else {
-    prev->dep_next = NULL;
-  }
+		link_dep(prev, next);
+	} else {
+		prev->dep_next = NULL;
+	}
 }
 
-void nghttp2_stream_dep_add(nghttp2_stream *dep_stream,
-                            nghttp2_stream *stream) {
-  DEBUGF("stream: dep_add dep_stream(%p)=%d, stream(%p)=%d\n", dep_stream,
-         dep_stream->stream_id, stream, stream->stream_id);
+void nghttp2_stream_dep_add(nghttp2_stream *dep_stream, nghttp2_stream *stream) {
+	DEBUGF("stream: dep_add dep_stream(%p)=%d, stream(%p)=%d\n", dep_stream,
+			dep_stream->stream_id, stream, stream->stream_id);
 
-  dep_stream->sum_dep_weight += stream->weight;
+	dep_stream->sum_dep_weight += stream->weight;
 
-  if (dep_stream->dep_next == NULL) {
-    link_dep(dep_stream, stream);
-  } else {
-    insert_link_dep(dep_stream, stream);
-  }
+	if (dep_stream->dep_next == NULL) {
+		link_dep(dep_stream, stream);
+	} else {
+		insert_link_dep(dep_stream, stream);
+	}
 
-  validate_tree(stream);
+	validate_tree(stream);
 }
 
 int nghttp2_stream_dep_remove(nghttp2_stream *stream) {
-  nghttp2_stream *dep_prev, *si;
-  int32_t sum_dep_weight_delta;
-  int rv;
+	nghttp2_stream *dep_prev, *si;
+	int32_t sum_dep_weight_delta;
+	int rv;
 
-  DEBUGF("stream: dep_remove stream(%p)=%d\n", stream, stream->stream_id);
+	DEBUGF("stream: dep_remove stream(%p)=%d\n", stream, stream->stream_id);
 
-  /* Distribute weight of |stream| to direct descendants */
-  sum_dep_weight_delta = -stream->weight;
+	/* Distribute weight of |stream| to direct descendants */
+	sum_dep_weight_delta = -stream->weight;
 
-  for (si = stream->dep_next; si; si = si->sib_next) {
-    si->weight = nghttp2_stream_dep_distributed_weight(stream, si->weight);
+	for (si = stream->dep_next; si; si = si->sib_next) {
+		si->weight = nghttp2_stream_dep_distributed_weight(stream, si->weight);
 
-    sum_dep_weight_delta += si->weight;
+		sum_dep_weight_delta += si->weight;
 
-    if (si->queued) {
-      rv = stream_obq_move(stream->dep_prev, stream, si);
-      if (rv != 0) {
-        return rv;
-      }
-    }
-  }
+		if (si->queued) {
+			rv = stream_obq_move(stream->dep_prev, stream, si);
+			if (rv != 0) {
+				return rv;
+			}
+		}
+	}
 
-  assert(stream->dep_prev);
+	assert(stream->dep_prev);
 
-  dep_prev = stream->dep_prev;
+	dep_prev = stream->dep_prev;
 
-  dep_prev->sum_dep_weight += sum_dep_weight_delta;
+	dep_prev->sum_dep_weight += sum_dep_weight_delta;
 
-  if (stream->queued) {
-    stream_obq_remove(stream);
-  }
+	if (stream->queued) {
+		stream_obq_remove(stream);
+	}
 
-  if (stream->sib_prev) {
-    unlink_sib(stream);
-  } else {
-    unlink_dep(stream);
-  }
+	if (stream->sib_prev) {
+		unlink_sib(stream);
+	} else {
+		unlink_dep(stream);
+	}
 
-  stream->sum_dep_weight = 0;
+	stream->sum_dep_weight = 0;
 
-  stream->dep_prev = NULL;
-  stream->dep_next = NULL;
-  stream->sib_prev = NULL;
-  stream->sib_next = NULL;
+	stream->dep_prev = NULL;
+	stream->dep_next = NULL;
+	stream->sib_prev = NULL;
+	stream->sib_next = NULL;
 
-  validate_tree(dep_prev);
+	validate_tree(dep_prev);
 
-  return 0;
+	return 0;
 }
 
 int nghttp2_stream_dep_insert_subtree(nghttp2_stream *dep_stream,
-                                      nghttp2_stream *stream) {
-  nghttp2_stream *last_sib;
-  nghttp2_stream *dep_next;
-  nghttp2_stream *si;
-  int rv;
+		nghttp2_stream *stream) {
+	nghttp2_stream *last_sib;
+	nghttp2_stream *dep_next;
+	nghttp2_stream *si;
+	int rv;
 
-  DEBUGF("stream: dep_insert_subtree dep_stream(%p)=%d stream(%p)=%d\n",
-         dep_stream, dep_stream->stream_id, stream, stream->stream_id);
+	DEBUGF("stream: dep_insert_subtree dep_stream(%p)=%d stream(%p)=%d\n",
+			dep_stream, dep_stream->stream_id, stream, stream->stream_id);
 
-  stream->sum_dep_weight += dep_stream->sum_dep_weight;
-  dep_stream->sum_dep_weight = stream->weight;
+	stream->sum_dep_weight += dep_stream->sum_dep_weight;
+	dep_stream->sum_dep_weight = stream->weight;
 
-  if (dep_stream->dep_next) {
-    dep_next = dep_stream->dep_next;
+	if (dep_stream->dep_next) {
+		dep_next = dep_stream->dep_next;
 
-    link_dep(dep_stream, stream);
+		link_dep(dep_stream, stream);
 
-    if (stream->dep_next) {
-      last_sib = stream_last_sib(stream->dep_next);
+		if (stream->dep_next) {
+			last_sib = stream_last_sib(stream->dep_next);
 
-      link_sib(last_sib, dep_next);
-    } else {
-      link_dep(stream, dep_next);
-    }
+			link_sib(last_sib, dep_next);
+		} else {
+			link_dep(stream, dep_next);
+		}
 
-    for (si = dep_next; si; si = si->sib_next) {
-      si->dep_prev = stream;
-      if (si->queued) {
-        rv = stream_obq_move(stream, dep_stream, si);
-        if (rv != 0) {
-          return rv;
-        }
-      }
-    }
-  } else {
-    link_dep(dep_stream, stream);
-  }
+		for (si = dep_next; si; si = si->sib_next) {
+			si->dep_prev = stream;
+			if (si->queued) {
+				rv = stream_obq_move(stream, dep_stream, si);
+				if (rv != 0) {
+					return rv;
+				}
+			}
+		}
+	} else {
+		link_dep(dep_stream, stream);
+	}
 
-  if (stream_subtree_active(stream)) {
-    rv = stream_obq_push(dep_stream, stream);
-    if (rv != 0) {
-      return rv;
-    }
-  }
+	if (stream_subtree_active(stream)) {
+		rv = stream_obq_push(dep_stream, stream);
+		if (rv != 0) {
+			return rv;
+		}
+	}
 
-  validate_tree(dep_stream);
+	validate_tree(dep_stream);
 
-  return 0;
+	return 0;
 }
 
 int nghttp2_stream_dep_add_subtree(nghttp2_stream *dep_stream,
-                                   nghttp2_stream *stream) {
-  int rv;
+		nghttp2_stream *stream) {
+	int rv;
 
-  DEBUGF("stream: dep_add_subtree dep_stream(%p)=%d stream(%p)=%d\n",
-         dep_stream, dep_stream->stream_id, stream, stream->stream_id);
+	DEBUGF("stream: dep_add_subtree dep_stream(%p)=%d stream(%p)=%d\n",
+			dep_stream, dep_stream->stream_id, stream, stream->stream_id);
 
-  dep_stream->sum_dep_weight += stream->weight;
+	dep_stream->sum_dep_weight += stream->weight;
 
-  if (dep_stream->dep_next) {
-    insert_link_dep(dep_stream, stream);
-  } else {
-    link_dep(dep_stream, stream);
-  }
+	if (dep_stream->dep_next) {
+		insert_link_dep(dep_stream, stream);
+	} else {
+		link_dep(dep_stream, stream);
+	}
 
-  if (stream_subtree_active(stream)) {
-    rv = stream_obq_push(dep_stream, stream);
-    if (rv != 0) {
-      return rv;
-    }
-  }
+	if (stream_subtree_active(stream)) {
+		rv = stream_obq_push(dep_stream, stream);
+		if (rv != 0) {
+			return rv;
+		}
+	}
 
-  validate_tree(dep_stream);
+	validate_tree(dep_stream);
 
-  return 0;
+	return 0;
 }
 
 void nghttp2_stream_dep_remove_subtree(nghttp2_stream *stream) {
-  nghttp2_stream *next, *dep_prev;
+	nghttp2_stream *next, *dep_prev;
 
-  DEBUGF("stream: dep_remove_subtree stream(%p)=%d\n", stream,
-         stream->stream_id);
+	DEBUGF("stream: dep_remove_subtree stream(%p)=%d\n", stream,
+			stream->stream_id);
 
-  assert(stream->dep_prev);
+	assert(stream->dep_prev);
 
-  dep_prev = stream->dep_prev;
+	dep_prev = stream->dep_prev;
 
-  if (stream->sib_prev) {
-    link_sib(stream->sib_prev, stream->sib_next);
-  } else {
-    next = stream->sib_next;
+	if (stream->sib_prev) {
+		link_sib(stream->sib_prev, stream->sib_next);
+	} else {
+		next = stream->sib_next;
 
-    link_dep(dep_prev, next);
+		link_dep(dep_prev, next);
 
-    if (next) {
-      next->sib_prev = NULL;
-    }
-  }
+		if (next) {
+			next->sib_prev = NULL;
+		}
+	}
 
-  dep_prev->sum_dep_weight -= stream->weight;
+	dep_prev->sum_dep_weight -= stream->weight;
 
-  if (stream->queued) {
-    stream_obq_remove(stream);
-  }
+	if (stream->queued) {
+		stream_obq_remove(stream);
+	}
 
-  validate_tree(dep_prev);
+	validate_tree(dep_prev);
 
-  stream->sib_prev = NULL;
-  stream->sib_next = NULL;
-  stream->dep_prev = NULL;
+	stream->sib_prev = NULL;
+	stream->sib_next = NULL;
+	stream->dep_prev = NULL;
 }
 
 int nghttp2_stream_in_dep_tree(nghttp2_stream *stream) {
-  return stream->dep_prev || stream->dep_next || stream->sib_prev ||
-         stream->sib_next;
+	return stream->dep_prev || stream->dep_next || stream->sib_prev
+			|| stream->sib_next;
 }
 
-nghttp2_outbound_item *
+nghttp2_outbound_item*
 nghttp2_stream_next_outbound_item(nghttp2_stream *stream) {
-  nghttp2_pq_entry *ent;
-  nghttp2_stream *si;
+	nghttp2_pq_entry *ent;
+	nghttp2_stream *si;
 
-  for (;;) {
-    if (stream_active(stream)) {
-      /* Update ascendant's descendant_last_cycle here, so that we can
-         assure that new stream is scheduled based on it. */
-      for (si = stream; si->dep_prev; si = si->dep_prev) {
-        si->dep_prev->descendant_last_cycle = si->cycle;
-      }
-      return stream->item;
-    }
-    ent = nghttp2_pq_top(&stream->obq);
-    if (!ent) {
-      return NULL;
-    }
-    stream = nghttp2_struct_of(ent, nghttp2_stream, pq_entry);
-  }
+	for (;;) {
+		if (stream_active(stream)) {
+			/* Update ascendant's descendant_last_cycle here, so that we can
+			 assure that new stream is scheduled based on it. */
+			for (si = stream; si->dep_prev; si = si->dep_prev) {
+				si->dep_prev->descendant_last_cycle = si->cycle;
+			}
+			return stream->item;
+		}
+		ent = nghttp2_pq_top(&stream->obq);
+		if (!ent) {
+			return NULL;
+		}
+		stream = nghttp2_struct_of(ent, nghttp2_stream, pq_entry);
+	}
 }
 
 nghttp2_stream_proto_state nghttp2_stream_get_state(nghttp2_stream *stream) {
-  if (stream->flags & NGHTTP2_STREAM_FLAG_CLOSED) {
-    return NGHTTP2_STREAM_STATE_CLOSED;
-  }
+	if (stream->flags & NGHTTP2_STREAM_FLAG_CLOSED) {
+		return NGHTTP2_STREAM_STATE_CLOSED;
+	}
 
-  if (stream->flags & NGHTTP2_STREAM_FLAG_PUSH) {
-    if (stream->shut_flags & NGHTTP2_SHUT_RD) {
-      return NGHTTP2_STREAM_STATE_RESERVED_LOCAL;
-    }
+	if (stream->flags & NGHTTP2_STREAM_FLAG_PUSH) {
+		if (stream->shut_flags & NGHTTP2_SHUT_RD) {
+			return NGHTTP2_STREAM_STATE_RESERVED_LOCAL;
+		}
 
-    if (stream->shut_flags & NGHTTP2_SHUT_WR) {
-      return NGHTTP2_STREAM_STATE_RESERVED_REMOTE;
-    }
-  }
+		if (stream->shut_flags & NGHTTP2_SHUT_WR) {
+			return NGHTTP2_STREAM_STATE_RESERVED_REMOTE;
+		}
+	}
 
-  if (stream->shut_flags & NGHTTP2_SHUT_RD) {
-    return NGHTTP2_STREAM_STATE_HALF_CLOSED_REMOTE;
-  }
+	if (stream->shut_flags & NGHTTP2_SHUT_RD) {
+		return NGHTTP2_STREAM_STATE_HALF_CLOSED_REMOTE;
+	}
 
-  if (stream->shut_flags & NGHTTP2_SHUT_WR) {
-    return NGHTTP2_STREAM_STATE_HALF_CLOSED_LOCAL;
-  }
+	if (stream->shut_flags & NGHTTP2_SHUT_WR) {
+		return NGHTTP2_STREAM_STATE_HALF_CLOSED_LOCAL;
+	}
 
-  if (stream->state == NGHTTP2_STREAM_IDLE) {
-    return NGHTTP2_STREAM_STATE_IDLE;
-  }
+	if (stream->state == NGHTTP2_STREAM_IDLE) {
+		return NGHTTP2_STREAM_STATE_IDLE;
+	}
 
-  return NGHTTP2_STREAM_STATE_OPEN;
+	return NGHTTP2_STREAM_STATE_OPEN;
 }
 
-nghttp2_stream *nghttp2_stream_get_parent(nghttp2_stream *stream) {
-  return stream->dep_prev;
+nghttp2_stream* nghttp2_stream_get_parent(nghttp2_stream *stream) {
+	return stream->dep_prev;
 }
 
-nghttp2_stream *nghttp2_stream_get_next_sibling(nghttp2_stream *stream) {
-  return stream->sib_next;
+nghttp2_stream* nghttp2_stream_get_next_sibling(nghttp2_stream *stream) {
+	return stream->sib_next;
 }
 
-nghttp2_stream *nghttp2_stream_get_previous_sibling(nghttp2_stream *stream) {
-  return stream->sib_prev;
+nghttp2_stream* nghttp2_stream_get_previous_sibling(nghttp2_stream *stream) {
+	return stream->sib_prev;
 }
 
-nghttp2_stream *nghttp2_stream_get_first_child(nghttp2_stream *stream) {
-  return stream->dep_next;
+nghttp2_stream* nghttp2_stream_get_first_child(nghttp2_stream *stream) {
+	return stream->dep_next;
 }
 
 int32_t nghttp2_stream_get_weight(nghttp2_stream *stream) {
-  return stream->weight;
+	return stream->weight;
 }
 
 int32_t nghttp2_stream_get_sum_dependency_weight(nghttp2_stream *stream) {
-  return stream->sum_dep_weight;
+	return stream->sum_dep_weight;
 }
 
 int32_t nghttp2_stream_get_stream_id(nghttp2_stream *stream) {
-  return stream->stream_id;
+	return stream->stream_id;
 }

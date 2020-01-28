@@ -57,44 +57,36 @@
  * DESCRIPTION:	initialize a decoder object with callback routines
  */
 void mad_decoder_init(struct mad_decoder *decoder, void *data,
-		      enum mad_flow (*input_func)(void *,
-						  struct mad_stream *),
-		      enum mad_flow (*header_func)(void *,
-						   struct mad_header const *),
-		      enum mad_flow (*filter_func)(void *,
-						   struct mad_stream const *,
-						   struct mad_frame *),
-		      enum mad_flow (*output_func)(void *,
-						   struct mad_header const *,
-						   struct mad_pcm *),
-		      enum mad_flow (*error_func)(void *,
-						  struct mad_stream *,
-						  struct mad_frame *),
-		      enum mad_flow (*message_func)(void *,
-						    void *, unsigned int *))
-{
-  decoder->mode         = -1;
+		enum mad_flow (*input_func)(void*, struct mad_stream*),
+		enum mad_flow (*header_func)(void*, struct mad_header const*),
+		enum mad_flow (*filter_func)(void*, struct mad_stream const*,
+				struct mad_frame*),
+		enum mad_flow (*output_func)(void*, struct mad_header const*,
+				struct mad_pcm*),
+		enum mad_flow (*error_func)(void*, struct mad_stream*,
+				struct mad_frame*),
+		enum mad_flow (*message_func)(void*, void*, unsigned int*)) {
+	decoder->mode = -1;
 
-  decoder->options      = 0;
+	decoder->options = 0;
 
-  decoder->async.pid    = 0;
-  decoder->async.in     = -1;
-  decoder->async.out    = -1;
+	decoder->async.pid = 0;
+	decoder->async.in = -1;
+	decoder->async.out = -1;
 
-  decoder->sync         = 0;
+	decoder->sync = 0;
 
-  decoder->cb_data      = data;
+	decoder->cb_data = data;
 
-  decoder->input_func   = input_func;
-  decoder->header_func  = header_func;
-  decoder->filter_func  = filter_func;
-  decoder->output_func  = output_func;
-  decoder->error_func   = error_func;
-  decoder->message_func = message_func;
+	decoder->input_func = input_func;
+	decoder->header_func = header_func;
+	decoder->filter_func = filter_func;
+	decoder->output_func = output_func;
+	decoder->error_func = error_func;
+	decoder->message_func = message_func;
 }
 
-int mad_decoder_finish(struct mad_decoder *decoder)
-{
+int mad_decoder_finish(struct mad_decoder *decoder) {
 # if defined(USE_ASYNC)
   if (decoder->mode == MAD_DECODER_MODE_ASYNC && decoder->async.pid) {
     pid_t pid;
@@ -121,7 +113,7 @@ int mad_decoder_finish(struct mad_decoder *decoder)
   }
 # endif
 
-  return 0;
+	return 0;
 }
 
 # if defined(USE_ASYNC)
@@ -292,76 +284,72 @@ enum mad_flow check_message(struct mad_decoder *decoder)
 }
 # endif
 
-static
-enum mad_flow error_default(void *data, struct mad_stream *stream,
-			    struct mad_frame *frame)
-{
-  int *bad_last_frame = data;
+static enum mad_flow error_default(void *data, struct mad_stream *stream,
+		struct mad_frame *frame) {
+	int *bad_last_frame = data;
 
-  switch (stream->error) {
-  case MAD_ERROR_BADCRC:
-    if (*bad_last_frame)
-      mad_frame_mute(frame);
-    else
-      *bad_last_frame = 1;
+	switch (stream->error) {
+	case MAD_ERROR_BADCRC:
+		if (*bad_last_frame)
+			mad_frame_mute(frame);
+		else
+			*bad_last_frame = 1;
 
-    return MAD_FLOW_IGNORE;
+		return MAD_FLOW_IGNORE;
 
-  default:
-    return MAD_FLOW_CONTINUE;
-  }
+	default:
+		return MAD_FLOW_CONTINUE;
+	}
 }
 
 static
-int run_sync(struct mad_decoder *decoder)
-{
-  enum mad_flow (*error_func)(void *, struct mad_stream *, struct mad_frame *);
-  void *error_data;
-  int bad_last_frame = 0;
-  struct mad_stream *stream;
-  struct mad_frame *frame;
-  struct mad_synth *synth;
-  int result = 0;
-  int r;
+int run_sync(struct mad_decoder *decoder) {
+	enum mad_flow (*error_func)(void*, struct mad_stream*, struct mad_frame*);
+	void *error_data;
+	int bad_last_frame = 0;
+	struct mad_stream *stream;
+	struct mad_frame *frame;
+	struct mad_synth *synth;
+	int result = 0;
+	int r;
 
 //	printf("run_sync\n");
-  if (decoder->input_func == 0)
-    return 0;
+	if (decoder->input_func == 0)
+		return 0;
 
-  if (decoder->error_func) {
-    error_func = decoder->error_func;
-    error_data = decoder->cb_data;
-  }
-  else {
-    error_func = error_default;
-    error_data = &bad_last_frame;
-  }
+	if (decoder->error_func) {
+		error_func = decoder->error_func;
+		error_data = decoder->cb_data;
+	} else {
+		error_func = error_default;
+		error_data = &bad_last_frame;
+	}
 
-  stream = &decoder->sync->stream;
-  frame  = &decoder->sync->frame;
-  synth  = &decoder->sync->synth;
+	stream = &decoder->sync->stream;
+	frame = &decoder->sync->frame;
+	synth = &decoder->sync->synth;
 
-  mad_stream_init(stream);
-  mad_frame_init(frame);
-  mad_synth_init(synth);
+	mad_stream_init(stream);
+	mad_frame_init(frame);
+	mad_synth_init(synth);
 
-  mad_stream_options(stream, decoder->options);
+	mad_stream_options(stream, decoder->options);
 
-  do {
-    r=decoder->input_func(decoder->cb_data, stream);
+	do {
+		r = decoder->input_func(decoder->cb_data, stream);
 //   printf("Input fn: %d\n", r);
-    switch (r) {
-    case MAD_FLOW_STOP:
-      goto done;
-    case MAD_FLOW_BREAK:
-      goto fail;
-    case MAD_FLOW_IGNORE:
-      continue;
-    case MAD_FLOW_CONTINUE:
-      break;
-    }
+		switch (r) {
+		case MAD_FLOW_STOP:
+			goto done;
+		case MAD_FLOW_BREAK:
+			goto fail;
+		case MAD_FLOW_IGNORE:
+			continue;
+		case MAD_FLOW_CONTINUE:
+			break;
+		}
 
-    while (1) {
+		while (1) {
 # if defined(USE_ASYNC)
       if (decoder->mode == MAD_DECODER_MODE_ASYNC) {
 	switch (check_message(decoder)) {
@@ -376,99 +364,95 @@ int run_sync(struct mad_decoder *decoder)
       }
 # endif
 
-      if (decoder->header_func) {
-	r=mad_header_decode(&frame->header, stream);
+			if (decoder->header_func) {
+				r = mad_header_decode(&frame->header, stream);
 //	printf("mad_header_decode_func: %d\n", r);
-	if (r!=-1) {
-	  if (!MAD_RECOVERABLE(stream->error))
-	    break;
+				if (r != -1) {
+					if (!MAD_RECOVERABLE(stream->error))
+						break;
 
-	  switch (error_func(error_data, stream, frame)) {
-	  case MAD_FLOW_STOP:
-	    goto done;
-	  case MAD_FLOW_BREAK:
-	    goto fail;
-	  case MAD_FLOW_IGNORE:
-	  case MAD_FLOW_CONTINUE:
-	  default:
-	    continue;
-	  }
-	}
+					switch (error_func(error_data, stream, frame)) {
+					case MAD_FLOW_STOP:
+						goto done;
+					case MAD_FLOW_BREAK:
+						goto fail;
+					case MAD_FLOW_IGNORE:
+					case MAD_FLOW_CONTINUE:
+					default:
+						continue;
+					}
+				}
 
-	switch (decoder->header_func(decoder->cb_data, &frame->header)) {
-	case MAD_FLOW_STOP:
-	  goto done;
-	case MAD_FLOW_BREAK:
-	  goto fail;
-	case MAD_FLOW_IGNORE:
-	  continue;
-	case MAD_FLOW_CONTINUE:
-	  break;
-	}
-      }
+				switch (decoder->header_func(decoder->cb_data, &frame->header)) {
+				case MAD_FLOW_STOP:
+					goto done;
+				case MAD_FLOW_BREAK:
+					goto fail;
+				case MAD_FLOW_IGNORE:
+					continue;
+				case MAD_FLOW_CONTINUE:
+					break;
+				}
+			}
 
-      r=mad_frame_decode(frame, stream);
+			r = mad_frame_decode(frame, stream);
 //	printf("mad_frame_decode: %d\n", r);
-      if (r == -1) {
-	if (!MAD_RECOVERABLE(stream->error))
-	  break;
+			if (r == -1) {
+				if (!MAD_RECOVERABLE(stream->error))
+					break;
 
-	switch (error_func(error_data, stream, frame)) {
-	case MAD_FLOW_STOP:
-	  goto done;
-	case MAD_FLOW_BREAK:
-	  goto fail;
-	case MAD_FLOW_IGNORE:
-	  break;
-	case MAD_FLOW_CONTINUE:
-	default:
-	  continue;
-	}
-      }
-      else
-	bad_last_frame = 0;
+				switch (error_func(error_data, stream, frame)) {
+				case MAD_FLOW_STOP:
+					goto done;
+				case MAD_FLOW_BREAK:
+					goto fail;
+				case MAD_FLOW_IGNORE:
+					break;
+				case MAD_FLOW_CONTINUE:
+				default:
+					continue;
+				}
+			} else
+				bad_last_frame = 0;
 
-      if (decoder->filter_func) {
-	switch (decoder->filter_func(decoder->cb_data, stream, frame)) {
-	case MAD_FLOW_STOP:
-	  goto done;
-	case MAD_FLOW_BREAK:
-	  goto fail;
-	case MAD_FLOW_IGNORE:
-	  continue;
-	case MAD_FLOW_CONTINUE:
-	  break;
-	}
-      }
+			if (decoder->filter_func) {
+				switch (decoder->filter_func(decoder->cb_data, stream, frame)) {
+				case MAD_FLOW_STOP:
+					goto done;
+				case MAD_FLOW_BREAK:
+					goto fail;
+				case MAD_FLOW_IGNORE:
+					continue;
+				case MAD_FLOW_CONTINUE:
+					break;
+				}
+			}
 
-      mad_synth_frame(synth, frame);
+			mad_synth_frame(synth, frame);
 
 //	printf("Calling output fn\n");
-      if (decoder->output_func) {
-	switch (decoder->output_func(decoder->cb_data,
-				     &frame->header, &synth->pcm)) {
-	case MAD_FLOW_STOP:
-	  goto done;
-	case MAD_FLOW_BREAK:
-	  goto fail;
-	case MAD_FLOW_IGNORE:
-	case MAD_FLOW_CONTINUE:
-	  break;
-	}
-      }
-    }
-  }
-  while (stream->error == MAD_ERROR_BUFLEN);
+			if (decoder->output_func) {
+				switch (decoder->output_func(decoder->cb_data, &frame->header,
+						&synth->pcm)) {
+				case MAD_FLOW_STOP:
+					goto done;
+				case MAD_FLOW_BREAK:
+					goto fail;
+				case MAD_FLOW_IGNORE:
+				case MAD_FLOW_CONTINUE:
+					break;
+				}
+			}
+		}
+	} while (stream->error == MAD_ERROR_BUFLEN);
 
- fail:
-  result = -1;
+	fail: result = -1;
 
- done:
-  mad_synth_finish(synth);
-  mad_frame_finish(frame);
-  mad_stream_finish(stream);
+	done: mad_synth_finish(synth);
+	mad_frame_finish(frame);
+	mad_stream_finish(stream);
 
-  return result;
+	return result;
 }
 
 # if defined(USE_ASYNC)
@@ -539,47 +523,45 @@ int run_async(struct mad_decoder *decoder)
  * NAME:	decoder->run()
  * DESCRIPTION:	run the decoder thread either synchronously or asynchronously
  */
-int mad_decoder_run(struct mad_decoder *decoder, enum mad_decoder_mode mode)
-{
-  int result;
-  int (*run)(struct mad_decoder *) = 0;
-  static struct sync_t decsync; //statically-allocated decoder obj
+int mad_decoder_run(struct mad_decoder *decoder, enum mad_decoder_mode mode) {
+	int result;
+	int (*run)(struct mad_decoder*) = 0;
+	static struct sync_t decsync; //statically-allocated decoder obj
 
-  switch (decoder->mode = mode) {
-  case MAD_DECODER_MODE_SYNC:
-    run = run_sync;
-    break;
+	switch (decoder->mode = mode) {
+	case MAD_DECODER_MODE_SYNC:
+		run = run_sync;
+		break;
 
-  case MAD_DECODER_MODE_ASYNC:
+	case MAD_DECODER_MODE_ASYNC:
 # if defined(USE_ASYNC)
     run = run_async;
 # endif
-    break;
-  }
+		break;
+	}
 
-  if (run == 0)
-    return -1;
+	if (run == 0)
+		return -1;
 
 //  decoder->sync = malloc(sizeof(*decoder->sync));
-  decoder->sync=&decsync;
-  if (decoder->sync == 0)
-    return -1;
+	decoder->sync = &decsync;
+	if (decoder->sync == 0)
+		return -1;
 
-  result = run(decoder);
+	result = run(decoder);
 
 //  free(decoder->sync);
 //  decoder->sync = 0;
 
-  return result;
+	return result;
 }
 
 /*
  * NAME:	decoder->message()
  * DESCRIPTION:	send a message to and receive a reply from the decoder process
  */
-int mad_decoder_message(struct mad_decoder *decoder,
-			void *message, unsigned int *len)
-{
+int mad_decoder_message(struct mad_decoder *decoder, void *message,
+		unsigned int *len) {
 # if defined(USE_ASYNC)
   if (decoder->mode != MAD_DECODER_MODE_ASYNC ||
       send(decoder->async.out, message, *len) != MAD_FLOW_CONTINUE ||
@@ -588,6 +570,6 @@ int mad_decoder_message(struct mad_decoder *decoder,
 
   return 0;
 # else
-  return -1;
+	return -1;
 # endif
 }

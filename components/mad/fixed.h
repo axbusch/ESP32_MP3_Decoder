@@ -28,9 +28,9 @@ typedef   signed int mad_fixed_t;
 typedef   signed int mad_fixed64hi_t;
 typedef unsigned int mad_fixed64lo_t;
 # else
-typedef   signed long mad_fixed_t;
+typedef signed long mad_fixed_t;
 
-typedef   signed long mad_fixed64hi_t;
+typedef signed long mad_fixed64hi_t;
 typedef unsigned long mad_fixed64lo_t;
 # endif
 
@@ -99,7 +99,7 @@ typedef mad_fixed_t mad_sample_t;
 
 # define mad_f_intpart(x)	((x) >> MAD_F_FRACBITS)
 # define mad_f_fracpart(x)	((x) & ((1L << MAD_F_FRACBITS) - 1))
-				/* (x should be positive) */
+/* (x should be positive) */
 
 # define mad_f_fromint(x)	((x) << MAD_F_FRACBITS)
 

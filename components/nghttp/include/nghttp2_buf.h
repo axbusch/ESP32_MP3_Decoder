@@ -35,20 +35,20 @@
 #include "nghttp2_mem.h"
 
 typedef struct {
-  /* This points to the beginning of the buffer. The effective range
-     of buffer is [begin, end). */
-  uint8_t *begin;
-  /* This points to the memory one byte beyond the end of the
-     buffer. */
-  uint8_t *end;
-  /* The position indicator for effective start of the buffer. pos <=
-     last must be hold. */
-  uint8_t *pos;
-  /* The position indicator for effective one beyond of the end of the
-     buffer. last <= end must be hold. */
-  uint8_t *last;
-  /* Mark arbitrary position in buffer [begin, end) */
-  uint8_t *mark;
+	/* This points to the beginning of the buffer. The effective range
+	 of buffer is [begin, end). */
+	uint8_t *begin;
+	/* This points to the memory one byte beyond the end of the
+	 buffer. */
+	uint8_t *end;
+	/* The position indicator for effective start of the buffer. pos <=
+	 last must be hold. */
+	uint8_t *pos;
+	/* The position indicator for effective one beyond of the end of the
+	 buffer. last <= end must be hold. */
+	uint8_t *last;
+	/* Mark arbitrary position in buffer [begin, end) */
+	uint8_t *mark;
 } nghttp2_buf;
 
 #define nghttp2_buf_len(BUF) ((size_t)((BUF)->last - (BUF)->pos))
@@ -125,33 +125,33 @@ typedef struct nghttp2_buf_chain nghttp2_buf_chain;
 
 /* Chains 2 buffers */
 struct nghttp2_buf_chain {
-  /* Points to the subsequent buffer. NULL if there is no such
-     buffer. */
-  nghttp2_buf_chain *next;
-  nghttp2_buf buf;
+	/* Points to the subsequent buffer. NULL if there is no such
+	 buffer. */
+	nghttp2_buf_chain *next;
+	nghttp2_buf buf;
 };
 
 typedef struct {
-  /* Points to the first buffer */
-  nghttp2_buf_chain *head;
-  /* Buffer pointer where write occurs. */
-  nghttp2_buf_chain *cur;
-  /* Memory allocator */
-  nghttp2_mem *mem;
-  /* The buffer capacity of each buf.  This field may be 0 if
-     nghttp2_bufs is initialized by nghttp2_bufs_wrap_init* family
-     functions. */
-  size_t chunk_length;
-  /* The maximum number of nghttp2_buf_chain */
-  size_t max_chunk;
-  /* The number of nghttp2_buf_chain allocated */
-  size_t chunk_used;
-  /* The number of nghttp2_buf_chain to keep on reset */
-  size_t chunk_keep;
-  /* pos offset from begin in each buffers. On initialization and
-     reset, buf->pos and buf->last are positioned at buf->begin +
-     offset. */
-  size_t offset;
+	/* Points to the first buffer */
+	nghttp2_buf_chain *head;
+	/* Buffer pointer where write occurs. */
+	nghttp2_buf_chain *cur;
+	/* Memory allocator */
+	nghttp2_mem *mem;
+	/* The buffer capacity of each buf.  This field may be 0 if
+	 nghttp2_bufs is initialized by nghttp2_bufs_wrap_init* family
+	 functions. */
+	size_t chunk_length;
+	/* The maximum number of nghttp2_buf_chain */
+	size_t max_chunk;
+	/* The number of nghttp2_buf_chain allocated */
+	size_t chunk_used;
+	/* The number of nghttp2_buf_chain to keep on reset */
+	size_t chunk_keep;
+	/* pos offset from begin in each buffers. On initialization and
+	 reset, buf->pos and buf->last are positioned at buf->begin +
+	 offset. */
+	size_t offset;
 } nghttp2_bufs;
 
 /*
@@ -159,14 +159,14 @@ typedef struct {
  * arguments and offset = 0.
  */
 int nghttp2_bufs_init(nghttp2_bufs *bufs, size_t chunk_length, size_t max_chunk,
-                      nghttp2_mem *mem);
+		nghttp2_mem *mem);
 
 /*
  * This is the same as calling nghttp2_bufs_init3 with the given
  * arguments and chunk_keep = max_chunk.
  */
 int nghttp2_bufs_init2(nghttp2_bufs *bufs, size_t chunk_length,
-                       size_t max_chunk, size_t offset, nghttp2_mem *mem);
+		size_t max_chunk, size_t offset, nghttp2_mem *mem);
 
 /*
  * Initializes |bufs|. Each buffer size is given in the
@@ -188,8 +188,7 @@ int nghttp2_bufs_init2(nghttp2_bufs *bufs, size_t chunk_length,
  *     long.
  */
 int nghttp2_bufs_init3(nghttp2_bufs *bufs, size_t chunk_length,
-                       size_t max_chunk, size_t chunk_keep, size_t offset,
-                       nghttp2_mem *mem);
+		size_t max_chunk, size_t chunk_keep, size_t offset, nghttp2_mem *mem);
 
 /*
  * Frees any related resources to the |bufs|.
@@ -213,7 +212,7 @@ void nghttp2_bufs_free(nghttp2_bufs *bufs);
  *     Out of memory.
  */
 int nghttp2_bufs_wrap_init(nghttp2_bufs *bufs, uint8_t *begin, size_t len,
-                           nghttp2_mem *mem);
+		nghttp2_mem *mem);
 
 /*
  * Initializes |bufs| using supplied |veclen| size of buf vector
@@ -232,7 +231,7 @@ int nghttp2_bufs_wrap_init(nghttp2_bufs *bufs, uint8_t *begin, size_t len,
  *     Out of memory.
  */
 int nghttp2_bufs_wrap_init2(nghttp2_bufs *bufs, const nghttp2_vec *vec,
-                            size_t veclen, nghttp2_mem *mem);
+		size_t veclen, nghttp2_mem *mem);
 
 /*
  * Frees any related resource to the |bufs|.  This function does not

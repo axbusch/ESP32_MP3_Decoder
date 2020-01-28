@@ -31,51 +31,49 @@
  * NAME:	fixed->abs()
  * DESCRIPTION:	return absolute value of a fixed-point number
  */
-mad_fixed_t mad_f_abs(mad_fixed_t x)
-{
-  return x < 0 ? -x : x;
+mad_fixed_t mad_f_abs(mad_fixed_t x) {
+	return x < 0 ? -x : x;
 }
 
 /*
  * NAME:	fixed->div()
  * DESCRIPTION:	perform division using fixed-point math
  */
-mad_fixed_t mad_f_div(mad_fixed_t x, mad_fixed_t y)
-{
-  mad_fixed_t q, r;
-  unsigned int bits;
+mad_fixed_t mad_f_div(mad_fixed_t x, mad_fixed_t y) {
+	mad_fixed_t q, r;
+	unsigned int bits;
 
-  q = mad_f_abs(x / y);
+	q = mad_f_abs(x / y);
 
-  if (x < 0) {
-    x = -x;
-    y = -y;
-  }
+	if (x < 0) {
+		x = -x;
+		y = -y;
+	}
 
-  r = x % y;
+	r = x % y;
 
-  if (y < 0) {
-    x = -x;
-    y = -y;
-  }
+	if (y < 0) {
+		x = -x;
+		y = -y;
+	}
 
-  if (q > mad_f_intpart(MAD_F_MAX) &&
-      !(q == -mad_f_intpart(MAD_F_MIN) && r == 0 && (x < 0) != (y < 0)))
-    return 0;
+	if (q > mad_f_intpart(MAD_F_MAX)
+			&& !(q == -mad_f_intpart(MAD_F_MIN) && r == 0 && (x < 0) != (y < 0)))
+		return 0;
 
-  for (bits = MAD_F_FRACBITS; bits && r; --bits) {
-    q <<= 1, r <<= 1;
-    if (r >= y)
-      r -= y, ++q;
-  }
+	for (bits = MAD_F_FRACBITS; bits && r; --bits) {
+		q <<= 1, r <<= 1;
+		if (r >= y)
+			r -= y, ++q;
+	}
 
-  /* round */
-  if (2 * r >= y)
-    ++q;
+	/* round */
+	if (2 * r >= y)
+		++q;
 
-  /* fix sign */
-  if ((x < 0) != (y < 0))
-    q = -q;
+	/* fix sign */
+	if ((x < 0) != (y < 0))
+		q = -q;
 
-  return q << bits;
+	return q << bits;
 }

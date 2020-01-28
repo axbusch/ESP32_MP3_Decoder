@@ -1,8 +1,10 @@
 /build/
-
 /.settings/
 /.cproject
 /.project
 /sdkconfig
 /sdkconfig.old
 /.vscode
+/.vs
+/out
+/*.bat

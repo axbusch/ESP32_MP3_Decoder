@@ -1,33 +1,5 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include "http.h"
-#include "driver/i2s.h"
-
-#include "vector.h"
-#include "ui.h"
-#include "spiram_fifo.h"
-#include "audio_renderer.h"
-#include "web_radio.h"
-#include "playerconfig.h"
-#include "wifi.h"
 #include "app_main.h"
-#ifdef CONFIG_BT_SPEAKER_MODE
-#include "bt_speaker.h"
-#endif
-#include "playlist.h"
-
-
 #define WIFI_LIST_NUM   10
 
 
@@ -97,7 +69,7 @@ static renderer_config_t *create_renderer_config()
     return renderer_config;
 }
 
-static void start_web_radio()
+ void start_web_radio()
 {
     // init web radio
     web_radio_t *radio_config = calloc(1, sizeof(web_radio_t));
