@@ -5,3 +5,7 @@ idf_component_register(SRC_DIRS .
                        )
    
 					
+target_compile_options(${COMPONENT_LIB} PRIVATE   
+	-Wno-int-conversion -Wno-unused-variable -Wno-discarded-qualifiers
+)
+					

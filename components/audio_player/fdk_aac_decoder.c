@@ -73,7 +73,7 @@ void fdkaac_decoder_task(void *pvParameters)
         }
 
         // If out-of-band config data (AudioSpecificConfig(ASC) or StreamMuxConfig(SMC)) is available
-        uint8_t ascData[1] = {demux_res.codecdata};
+        //uint8_t ascData[1] = demux_res.codecdata;
         const uint32_t ascDataLen[1] = {demux_res.codecdata_len};
         err = aacDecoder_ConfigRaw(handle, &demux_res.codecdata, &demux_res.codecdata_len);
         if (err != AAC_DEC_OK) {
