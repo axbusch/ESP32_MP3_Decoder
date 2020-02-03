@@ -1,0 +1,36 @@
+﻿---
+BasedOnStyle: Google
+AccessModifierOffset: '-2'
+AlignTrailingComments : 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: 'false'
+AllowShortLoopsOnASingleLine: 'false'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBraces: Mozilla
+#BreakBeforeInheritanceComma: 'false'
+#BreakConstructorInitializers: BeforeColon
+ColumnLimit: '100'
+#CompactNamespaces: 'false'
+ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
+DerivePointerAlignment: 'false'
+ExperimentalAutoDetectBinPacking: 'false'
+#FixNamespaceComments: 'true'
+IndentCaseLabels: 'true'
+IndentWidth: '2'
+KeepEmptyLinesAtTheStartOfBlocks: 'true'
+Language: Cpp
+NamespaceIndentation: None
+PointerAlignment: Left
+SortIncludes: 'false'
+#SortUsingDeclarations: 'false'
+SpaceBeforeParens: ControlStatements
+Standard: Cpp11
+TabWidth: '2'
+UseTab: Never
+
+MaxEmptyLinesToKeep: 2
+
+...
