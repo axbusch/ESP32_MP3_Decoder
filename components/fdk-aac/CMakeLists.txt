@@ -18,5 +18,5 @@ idf_component_register(SRC_DIRS "libAACdec/src"
  
 target_compile_options(${COMPONENT_LIB} PRIVATE  
 	-Wno-implicit-fallthrough -Wno-maybe-uninitialized 
-	 -Wno-unused-label -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-variable )
+	 -Wno-unused-label -Wno-error=unused-function -Wno-unused-function -Wno-unused-but-set-variable -Wno-unused-variable )
 		
