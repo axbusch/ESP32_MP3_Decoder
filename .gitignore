@@ -2,11 +2,10 @@
 /.settings/
 /.cproject
 /.project
-/sdkconfig
-/sdkconfig.old
+
 /.vscode
 /.vs
 /out
-/*.bat
+
 mp3decoder.zip
 main/main.c
