@@ -194,8 +194,7 @@ static void http_get_task(void *pvParameters)
 void web_radio_start(web_radio_t *config)
 {
     // start reader task
-    xTaskCreatePinnedToCore(&http_get_task, "http_get_task", 2560, config, 20,
-    NULL, 0);
+    xTaskCreatePinnedToCore(&http_get_task, "http_get_task", 2560, config, 20, NULL, 0);
 }
 
 void web_radio_stop(web_radio_t *config)

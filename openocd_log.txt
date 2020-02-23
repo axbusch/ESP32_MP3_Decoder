@@ -1,137 +1,127 @@
+debug_level: 2
 none separate
 adapter speed: 10000 kHz
+ftdi samples TDO on falling edge of TCK
 Info : Configured 2 cores
-esp32 interrupt mask on
 Info : Listening on port 6666 for tcl connections
 Info : Listening on port 4444 for telnet connections
-Info : ftdi: if you experience problems at higher adapter clocks, try the command "ftdi_tdo_sample_edge falling"
+Error: type 'esp32' is missing virt2phys
 Info : clock speed 10000 kHz
 Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
 Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
 Info : Listening on port 3333 for gdb connections
 Info : accepting 'gdb' connection on tcp/3333
 Error: No symbols for FreeRTOS
-Info : Target halted. PRO_CPU: PC=0x401A0352 (active)    APP_CPU: PC=0x4000BFE4 
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x4000BFE4 
+Info : Target halted. CPU0: PC=0x401A043E (active)
+Info : Target halted. CPU1: PC=0x401A043E 
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
 Info : Flash mapping 0: 0x10020 -> 0x3f400020, 353 KB
 Info : Flash mapping 1: 0x70018 -> 0x400d0018, 839 KB
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x4000BFE4 
-Info : Auto-detected flash size 4096 KB
-Info : Using flash size 4096 KB
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x4000BFE4 
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : Auto-detected flash bank 'esp32.flash' size 4096 KB
+Info : Using flash bank 'esp32.flash' size 4096 KB
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
 Info : Flash mapping 0: 0x10020 -> 0x3f400020, 353 KB
 Info : Flash mapping 1: 0x70018 -> 0x400d0018, 839 KB
-Info : Using flash size 840 KB
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x4000BFE4 
+Info : Using flash bank 'esp32.irom' size 840 KB
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
 Info : Flash mapping 0: 0x10020 -> 0x3f400020, 353 KB
 Info : Flash mapping 1: 0x70018 -> 0x400d0018, 839 KB
-Info : Using flash size 356 KB
+Info : Using flash bank 'esp32.drom' size 356 KB
 Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
 Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
+Info : cpu0: Debug controller 0 was reset.
+Info : cpu0: Core 0 was reset.
+Info : cpu0: Target halted, PC=0x500000CF, debug_reason=00000000
+Info : esp32: Core 0 was reset.
+Info : esp32: Debug controller 1 was reset.
+Info : esp32: Core 1 was reset.
+Info : Target halted. CPU0: PC=0x40000400 (active)
+Info : Target halted. CPU1: PC=0x40000400 
 Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
 Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
+Info : cpu0: Debug controller 0 was reset.
+Info : cpu0: Core 0 was reset.
+Info : cpu0: Target halted, PC=0x500000CF, debug_reason=00000000
+Info : esp32: Core 0 was reset.
+Info : esp32: Debug controller 1 was reset.
+Info : esp32: Core 1 was reset.
+Info : Target halted. CPU0: PC=0x40000400 (active)
+Info : Target halted. CPU1: PC=0x40000400 
 ** Programming Started **
 auto erase enabled
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
-wrote 1359872 bytes from file D:/esp/remote/mp3decoder/build/mp3decoder.bin in 10.617607s (125.075 KiB/s)
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+wrote 1359872 bytes from file D:/esp/remote/esp32_mp3_decoder/build/esp32_mp3_decoder.bin in 10.429597s (127.330 KiB/s)
 ** Programming Finished **
 ** Verify Started **
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
-read 1356592 bytes from file D:/esp/remote/mp3decoder/build/mp3decoder.bin and flash bank 0 at offset 0x00010000 in 6.115349s (216.635 KiB/s)
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+read 1357584 bytes from file D:/esp/remote/esp32_mp3_decoder/build/esp32_mp3_decoder.bin and flash bank 0 at offset 0x00010000 in 5.786331s (229.120 KiB/s)
 contents match
 ** Verified OK **
 Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
 Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
-Info : Detected debug stubs @ 3ffb5b44 on core0 of target 'esp32'
-Info : Target halted. PRO_CPU: PC=0x401A0352 (active)    APP_CPU: PC=0x400DBB4A 
+Info : cpu0: Debug controller 0 was reset.
+Info : cpu0: Core 0 was reset.
+Info : cpu0: Target halted, PC=0x500000CF, debug_reason=00000000
+Info : esp32: Core 0 was reset.
+Info : esp32: Debug controller 1 was reset.
+Info : esp32: Core 1 was reset.
+Info : Target halted. CPU0: PC=0x40000400 (active)
+Info : Target halted. CPU1: PC=0x40000400 
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : Target halted. CPU0: PC=0x400D7CBC (active)
+Info : Target halted. CPU1: PC=0x401A043E 
+Info : cpu0: Detected debug stubs @ 3ffb5b44
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : Target halted. CPU0: PC=0x401A043E (active)
+Info : Target halted. CPU1: PC=0x401A043E 
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : Target halted. CPU0: PC=0x4009757C (active)
+Info : Target halted. CPU1: PC=0x40097993 
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : Target halted. CPU0: PC=0x401A043E (active)
+Info : Target halted. CPU1: PC=0x401A043E 
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: No free slots to add HW breakpoint!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Info : Target halted. CPU0: PC=0x401A043E (active)
+Info : Target halted. CPU1: PC=0x401A043E 
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
+Warn : cpu0: HW breakpoint not found!
+Info : cpu0: Target halted, PC=0x400916EA, debug_reason=00000001
 Info : dropped 'gdb' connection
-Info : accepting 'gdb' connection on tcp/3333
-Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x5F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x5F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
-Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
-** Programming Started **
-auto erase enabled
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
-wrote 1359872 bytes from file D:/esp/remote/mp3decoder/build/mp3decoder.bin in 10.639609s (124.817 KiB/s)
-** Programming Finished **
-** Verify Started **
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
-read 1356592 bytes from file D:/esp/remote/mp3decoder/build/mp3decoder.bin and flash bank 0 at offset 0x00010000 in 6.004344s (220.640 KiB/s)
-contents match
-** Verified OK **
-Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
-Info : Detected debug stubs @ 3ffb5b44 on core0 of target 'esp32'
-Info : Target halted. PRO_CPU: PC=0x40097627 (active)    APP_CPU: PC=0x40096F48 
-Info : Target halted. PRO_CPU: PC=0x401A0352 (active)    APP_CPU: PC=0x401A0352 
-Info : Target halted. PRO_CPU: PC=0x401A0352 (active)    APP_CPU: PC=0x40098574 
-Info : Target halted. PRO_CPU: PC=0x401A0352 (active)    APP_CPU: PC=0x401A0352 
-Info : Target halted. PRO_CPU: PC=0x401A0352 (active)    APP_CPU: PC=0x401A0352 
-Info : dropped 'gdb' connection
-Info : accepting 'gdb' connection on tcp/3333
-Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x5F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x5F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
-Info : JTAG tap: esp32.cpu0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : JTAG tap: esp32.cpu1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
-Info : esp32: Debug controller 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Core 0 was reset (pwrstat=0x5F, after clear 0x0F).
-Info : esp32: Debug controller 1 was reset (pwrstat=0x5F, after clear 0x5F).
-Info : esp32: Core 1 was reset (pwrstat=0x5F, after clear 0x5F).
-Info : Target halted. PRO_CPU: PC=0x5000004B (active)    APP_CPU: PC=0x00000000 
-Info : esp32: Core 0 was reset (pwrstat=0x1F, after clear 0x0F).
-Info : Target halted. PRO_CPU: PC=0x40000400 (active)    APP_CPU: PC=0x40000400 
-** Programming Started **
-auto erase enabled
-Info : Target halted. PRO_CPU: PC=0x4009171A (active)    APP_CPU: PC=0x40000400 
